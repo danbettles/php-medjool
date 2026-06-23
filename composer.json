@@ -1,0 +1,43 @@
+{
+    "name": "danbettles/php-medjool",
+    "description": "Like PHP dates, only juicier",
+    "type": "library",
+    "license": "ISC",
+    "authors": [
+        {
+            "name": "Daniel Bettles",
+            "email": "daniel@justathought.dev"
+        }
+    ],
+    "require": {
+        "php": "^8.3"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^12.5.30",
+        "squizlabs/php_codesniffer": "^4.0.1",
+        "danbettles/codesniffer-standard": "^3.0.0",
+        "phpstan/phpstan": "^2.2.2"
+    },
+    "autoload": {
+        "psr-4": {"DanBettles\\Medjool\\": "src/"}
+    },
+    "autoload-dev": {
+        "psr-4": {"DanBettles\\Medjool\\Tests\\": "tests/src/"}
+    },
+    "scripts": {
+        "app:dev:test": "phpunit --bootstrap=tests/bootstrap.php --colors=always tests/",
+        "app:dev:analyse": "phpstan analyse --level=max --ansi src/ tests/",
+        "app:dev:lint": "phpcs",
+        "app:dev:check-quality": [
+            "@app:dev:test",
+            "@app:dev:analyse",
+            "@app:dev:lint"
+        ]
+    },
+    "scripts-descriptions": {
+        "app:dev:test": "Runs the unit tests",
+        "app:dev:analyse": "Performs static-analysis on the code",
+        "app:dev:lint": "Lints the code",
+        "app:dev:check-quality": "Runs the unit tests, performs static analysis on the project, and lints the code"
+    }
+}

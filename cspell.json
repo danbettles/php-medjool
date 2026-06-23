@@ -1,0 +1,12 @@
+{
+    "ignoreWords": [
+        "codesniffer",
+        "danbettles",
+        "Medjool",
+        "phpcs",
+        "phpstan",
+        "phpunit",
+        "setTimezone",
+        "squizlabs"
+    ]
+}
