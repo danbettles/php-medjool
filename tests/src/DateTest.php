@@ -24,6 +24,9 @@ class DateTest extends TestCase
 {
     use TestCaseAssertionsTrait;
 
+    private const string FORMAT_DATE = 'Y-m-d';
+    private const string FORMAT_DATE_TIME = self::FORMAT_DATE . ' H:i:s.u';
+
     public function testIsReadonly(): void
     {
         $this->assertTrue(
@@ -205,6 +208,92 @@ class DateTest extends TestCase
     }
 
     /** @return array<mixed[]> */
+    public static function providesSingleComponents(): array
+    {
+        $dateTimeStr = '2026-06-18 10:16:42.654321';
+
+        return [
+            [
+                2026,
+                $dateTimeStr,
+                ['year'],
+            ],
+            [
+                6,
+                $dateTimeStr,
+                ['month'],
+            ],
+            [
+                18,
+                $dateTimeStr,
+                ['day'],
+            ],
+            [
+                10,
+                $dateTimeStr,
+                ['hour'],
+            ],
+            [
+                16,
+                $dateTimeStr,
+                ['minute'],
+            ],
+            [
+                42,
+                $dateTimeStr,
+                ['second'],
+            ],
+            [
+                654321,
+                $dateTimeStr,
+                ['microsecond'],
+            ],
+        ];
+    }
+
+    /**
+     * @param array{string} $methodArgs
+     */
+    #[DataProvider('providesSingleComponents')]
+    public function testGetcomponentReturnsTheValueOfASingleComponent(
+        int $expectedValue,
+        string $inputDateTimeStr,
+        array $methodArgs,
+    ): void {
+        $date = new Date($inputDateTimeStr);
+
+        $this->assertSame(
+            $expectedValue,
+            $date->getComponent(...$methodArgs),
+        );
+    }
+
+    public function testGetcomponentCallsGetcomponents(): void
+    {
+        $componentName = 'month';
+        $expectedValue = 6;
+
+        $dateMock = $this
+            ->getMockBuilder(Date::class)
+            ->onlyMethods(['getComponents'])
+            ->disableOriginalConstructor()
+            ->getMock()
+        ;
+
+        $dateMock
+            ->expects($this->once())
+            ->method('getComponents')
+            ->with($componentName)
+            ->willReturn([$componentName => $expectedValue])
+        ;
+
+        $this->assertSame(
+            $expectedValue,
+            $dateMock->getComponent($componentName),
+        );
+    }
+
+    /** @return array<mixed[]> */
     public static function providesIsoweekdayenumsByDate(): array
     {
         return [
@@ -253,7 +342,7 @@ class DateTest extends TestCase
     public function testFormatCallsTheProxyMethodOnly(): void
     {
         $expectedDateStr = '2026-06-19';
-        $format = 'Y-m-d';
+        $format = self::FORMAT_DATE;
 
         $dateMock = $this
             ->getMockBuilder(Date::class)
@@ -364,7 +453,7 @@ class DateTest extends TestCase
 
         $this->assertSame(
             $expectedDateTimeStr,
-            $startOfSomething->format('Y-m-d H:i:s.u'),
+            $startOfSomething->format(self::FORMAT_DATE_TIME),
         );
     }
 
@@ -613,7 +702,7 @@ class DateTest extends TestCase
 
         $this->assertSame(
             $expectedDateTimeStr,
-            $modified->format('Y-m-d H:i:s.u'),
+            $modified->format(self::FORMAT_DATE_TIME),
         );
     }
 
@@ -753,6 +842,46 @@ class DateTest extends TestCase
         $this->assertSame(
             $expectedDateTimeStr,
             (string) $dateMock,
+        );
+    }
+
+    public function testYesterdayReturnsADateForYesterday(): void
+    {
+        $yesterdayImmutable = new DateTimeImmutable('-1 day');
+
+        $this->assertDateTimeSimilar(
+            $yesterdayImmutable,
+            Date::yesterday()->toImmutable(),
+        );
+
+        $this->assertDateTimeSimilar(
+            $yesterdayImmutable,
+            Date::yesterday(startOfDay: false)->toImmutable(),
+        );
+
+        $this->assertSame(
+            $yesterdayImmutable->format(self::FORMAT_DATE . ' 00:00:00.000000'),
+            Date::yesterday(startOfDay: true)->format(self::FORMAT_DATE_TIME),
+        );
+    }
+
+    public function testTomorrowReturnsADateForTomorrow(): void
+    {
+        $tomorrowImmutable = new DateTimeImmutable('+1 day');
+
+        $this->assertDateTimeSimilar(
+            $tomorrowImmutable,
+            Date::tomorrow()->toImmutable(),
+        );
+
+        $this->assertDateTimeSimilar(
+            $tomorrowImmutable,
+            Date::tomorrow(startOfDay: false)->toImmutable(),
+        );
+
+        $this->assertSame(
+            $tomorrowImmutable->format(self::FORMAT_DATE . ' 00:00:00.000000'),
+            Date::tomorrow(startOfDay: true)->format(self::FORMAT_DATE_TIME),
         );
     }
 }

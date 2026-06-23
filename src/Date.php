@@ -125,6 +125,32 @@ readonly class Date
      */
     private DateTimeImmutable $pit;
 
+    /**
+     * Factory method
+     */
+    public static function yesterday(bool $startOfDay = false): self
+    {
+        $yesterday = new self('-1 day');
+
+        return $startOfDay
+            ? $yesterday->trunc()
+            : $yesterday
+        ;
+    }
+
+    /**
+     * Factory method
+     */
+    public static function tomorrow(bool $startOfDay = false): self
+    {
+        $tomorrow = new self('+1 day');
+
+        return $startOfDay
+            ? $tomorrow->trunc()
+            : $tomorrow
+        ;
+    }
+
     public function __construct(
         string|int|DateTimeInterface $dateTimeLike = 'now',
     ) {
@@ -242,7 +268,7 @@ readonly class Date
 
         if ('' !== $namesCsv) {
             $names = array_map(trim(...), explode($sep, $namesCsv));
-            // (Component-defs -- see above -- order)
+            // (Component-defs order)
             $filteredMap = array_intersect_key($formatCharsByComponentName, array_flip($names));
 
             if (count($names) !== count($filteredMap)) {
@@ -263,6 +289,14 @@ readonly class Date
         );
 
         return array_map(intval(...), $rawComponents);
+    }
+
+    /**
+     * Returns the value of a single component
+     */
+    public function getComponent(string $name): int
+    {
+        return $this->getComponents($name)[$name];
     }
 
     /**
