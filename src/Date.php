@@ -7,6 +7,7 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
 use LogicException;
+use NoDiscard;
 use OutOfBoundsException;
 
 use function array_column;
@@ -36,6 +37,8 @@ use const true;
  */
 readonly class Date
 {
+    private const string NO_DISCARD_MESSAGE = "`Date` is a Value Object: it won't be mutated by calling this method.  Therefore, not using the return value is wasteful/pointless.";
+
     private const string LOC_PAST = 'past';
     private const string LOC_PRESENT = 'present';
     private const string LOC_FUTURE = 'future';
@@ -175,6 +178,7 @@ readonly class Date
      *
      * For external use only
      */
+    #[NoDiscard(self::NO_DISCARD_MESSAGE)]
     public function modify(string $modifier): self
     {
         return new self($this->modifyThePitOnly($modifier));
@@ -302,6 +306,7 @@ readonly class Date
     /**
      * @param array<string,int> $overrides
      */
+    #[NoDiscard(self::NO_DISCARD_MESSAGE)]
     private function setComponents(array $overrides): self
     {
         $existing = $this->getComponents();
@@ -338,6 +343,7 @@ readonly class Date
      *
      * @throws OutOfBoundsException If the component name is invalid/inapplicable
      */
+    #[NoDiscard(self::NO_DISCARD_MESSAGE)]
     public function startOf(string $componentName = self::COMPONENT_DAY): self
     {
         $zeroValsByComponent = array_column(self::COMPONENTS, 'zeroValue', 'name');
@@ -374,6 +380,7 @@ readonly class Date
      * Alias for `startOf()`.  Named after, and behaves like, Oracle's `TRUNC` (date) function -- which is kinda what
      * inspired `startOf()`.
      */
+    #[NoDiscard(self::NO_DISCARD_MESSAGE)]
     public function trunc(string $componentName = self::COMPONENT_DAY): self
     {
         return $this->startOf($componentName);
@@ -432,6 +439,7 @@ readonly class Date
      *
      * Named after its `DateTimeImmutable` counterpart -- hence the spelling.
      */
+    #[NoDiscard(self::NO_DISCARD_MESSAGE)]
     public function setTimezone(
         DateTimeZone|string $dateTimeZone,
         bool $adjustTime = true,

@@ -497,7 +497,7 @@ class DateTest extends TestCase
         $this->expectException(OutOfBoundsException::class);
         $this->expectExceptionMessage("The component name, `{$invalidComponentName}`, is invalid/inapplicable");
 
-        new Date('2026-06-18 21:09:38.123456')->startOf($invalidComponentName);
+        $ignored = new Date('2026-06-18 21:09:38.123456')->startOf($invalidComponentName);
     }
 
     /**
