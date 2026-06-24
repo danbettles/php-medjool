@@ -121,6 +121,26 @@ class DateTest extends TestCase
         $this->assertDateTimeSimilar($mutable, $date->toMutable());
     }
 
+    public function testCanBeComparedWithOtherInstances(): void
+    {
+        $origin = new Date('2026-06-24 14:17');
+
+        $this->assertLessThan(
+            $origin,
+            $origin->modify('-1 second'),
+        );
+
+        $this->assertGreaterThan(
+            $origin,
+            $origin->modify('+1 second'),
+        );
+
+        $this->assertEquals(
+            $origin,
+            clone $origin,
+        );
+    }
+
     /** @return array<mixed[]> */
     public static function providesComponents(): array
     {
