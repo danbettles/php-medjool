@@ -37,7 +37,10 @@ use const true;
  */
 readonly class Date
 {
-    private const string NO_DISCARD_MESSAGE = "`Date` is a Value Object: it won't be mutated by calling this method.  Therefore, not using the return value is wasteful/pointless.";
+    private const string NO_DISCARD_MESSAGE = (
+        "`Date` is a Value Object: it won't be mutated by calling this method.  "
+            . "Therefore, not using the return value is wasteful/pointless."
+    );
 
     private const string LOC_PAST = 'past';
     private const string LOC_PRESENT = 'present';
@@ -129,29 +132,19 @@ readonly class Date
     private DateTimeImmutable $pit;
 
     /**
-     * Factory method
+     * Factory method, returns the start of yesterday
      */
-    public static function yesterday(bool $startOfDay = false): self
+    public static function yesterday(): self
     {
-        $yesterday = new self('-1 day');
-
-        return $startOfDay
-            ? $yesterday->trunc()
-            : $yesterday
-        ;
+        return new self('-1 day')->trunc();
     }
 
     /**
-     * Factory method
+     * Factory method, returns the start of tomorrow
      */
-    public static function tomorrow(bool $startOfDay = false): self
+    public static function tomorrow(): self
     {
-        $tomorrow = new self('+1 day');
-
-        return $startOfDay
-            ? $tomorrow->trunc()
-            : $tomorrow
-        ;
+        return new self('+1 day')->trunc();
     }
 
     public function __construct(

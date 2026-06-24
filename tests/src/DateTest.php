@@ -865,43 +865,19 @@ class DateTest extends TestCase
         );
     }
 
-    public function testYesterdayReturnsADateForYesterday(): void
+    public function testYesterdayReturnsTheStartOfYesterday(): void
     {
-        $yesterdayImmutable = new DateTimeImmutable('-1 day');
-
         $this->assertDateTimeSimilar(
-            $yesterdayImmutable,
+            new DateTimeImmutable('-1 day')->setTime(0, 0),
             Date::yesterday()->toImmutable(),
-        );
-
-        $this->assertDateTimeSimilar(
-            $yesterdayImmutable,
-            Date::yesterday(startOfDay: false)->toImmutable(),
-        );
-
-        $this->assertSame(
-            $yesterdayImmutable->format(self::FORMAT_DATE . ' 00:00:00.000000'),
-            Date::yesterday(startOfDay: true)->format(self::FORMAT_DATE_TIME),
         );
     }
 
-    public function testTomorrowReturnsADateForTomorrow(): void
+    public function testTomorrowReturnsTheStartOfTomorrow(): void
     {
-        $tomorrowImmutable = new DateTimeImmutable('+1 day');
-
         $this->assertDateTimeSimilar(
-            $tomorrowImmutable,
+            new DateTimeImmutable('+1 day')->setTime(0, 0),
             Date::tomorrow()->toImmutable(),
-        );
-
-        $this->assertDateTimeSimilar(
-            $tomorrowImmutable,
-            Date::tomorrow(startOfDay: false)->toImmutable(),
-        );
-
-        $this->assertSame(
-            $tomorrowImmutable->format(self::FORMAT_DATE . ' 00:00:00.000000'),
-            Date::tomorrow(startOfDay: true)->format(self::FORMAT_DATE_TIME),
         );
     }
 }
