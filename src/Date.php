@@ -71,7 +71,7 @@ readonly class Date
         [
             'name' => self::COMPONENT_YEAR,
             'zeroValue' => null,  // (N/A)
-            'format' => 'Y',
+            'format' => 'x',  // (Expanded if required, or standard if possible (like Y))
         ],
         [
             'name' => self::COMPONENT_MONTH,
@@ -252,11 +252,12 @@ readonly class Date
     }
 
     /**
-     * Returns the date formatted according to the ISO 8601 spec
+     * Returns the date in ISO-8601 Expanded format, which is supported by JavaScript's `Date` object -- see
+     * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date#date_time_string_format
      */
     public function toIsoDateTimeString(): string
     {
-        return $this->formatThePitOnly('c');
+        return $this->formatThePitOnly(DateTimeInterface::ISO8601_EXPANDED);
     }
 
     /**

@@ -7,6 +7,7 @@ use DanBettles\Medjool\IsoWeekdayEnum;
 use DanBettles\Medjool\TestCaseAssertionsTrait;
 use DateTime;
 use DateTimeImmutable;
+use DateTimeInterface;
 use DateTimeZone;
 use LogicException;
 use OutOfBoundsException;
@@ -394,9 +395,9 @@ class DateTest extends TestCase
                 'j M',
             ],
             [
-                '2026-06-19T14:17:28+00:00',
+                '+2026-06-19T14:17:28+00:00',
                 '2026-06-19 14:17:28.123456',
-                'c',
+                DateTimeInterface::ISO8601_EXPANDED,
             ],
         ];
     }
@@ -771,39 +772,76 @@ class DateTest extends TestCase
         );
     }
 
+    public function testToisodatetimestring(): void
+    {
+        // We go around the houses here so it's clear we started with something different to the expected output
+        $input = new DateTimeImmutable('2026-06-22 20:15:37')
+            ->setTimezone(new DateTimeZone('JST'))
+        ;
+
+        $this->assertSame(
+            '+2026-06-23T05:15:37+09:00',
+            new Date($input)->toIsoDateTimeString(),
+        );
+    }
+
+    public function testMagicTostringCallsToisodatetimestringOnly(): void
+    {
+        $expectedDateTimeStr = '+2026-06-23T05:15:37+09:00';
+
+        $dateMock = $this
+            ->getMockBuilder(Date::class)
+            ->onlyMethods(['toIsoDateTimeString'])
+            ->disableOriginalConstructor()
+            ->getMock()
+        ;
+
+        $dateMock
+            ->expects($this->once())
+            ->method('toIsoDateTimeString')
+            ->with()
+            ->willReturn($expectedDateTimeStr)
+        ;
+
+        $this->assertSame(
+            $expectedDateTimeStr,
+            (string) $dateMock,
+        );
+    }
+
     /** @return array<mixed[]> */
     public static function providesDatetimesSwitchedToADifferentTimeZone(): array
     {
         return [
             // Time-zone object:
             [
-                '2026-06-22T19:17:00+09:00',
+                '+2026-06-22T19:17:00+09:00',
                 '2026-06-22T11:17:00+01:00',  // (BST)
                 [new DateTimeZone('JST'), /* Time adjusted by default */],
             ],
             [
-                '2026-06-22T19:17:00+09:00',
+                '+2026-06-22T19:17:00+09:00',
                 '2026-06-22T11:17:00+01:00',  // (BST)
                 [new DateTimeZone('JST'), true],
             ],
             [
-                '2026-06-22T11:17:00+09:00',  // Note: same time!
+                '+2026-06-22T11:17:00+09:00',  // Note: same time!
                 '2026-06-22T11:17:00+01:00',  // (BST)
                 [new DateTimeZone('JST'), false],
             ],
             // Time-zone string:
             [
-                '2026-06-22T19:17:00+09:00',
+                '+2026-06-22T19:17:00+09:00',
                 '2026-06-22T11:17:00+01:00',  // (BST)
                 ['JST', /* Time adjusted by default */],
             ],
             [
-                '2026-06-22T19:17:00+09:00',
+                '+2026-06-22T19:17:00+09:00',
                 '2026-06-22T11:17:00+01:00',  // (BST)
                 ['JST', true],
             ],
             [
-                '2026-06-22T11:17:00+09:00',  // Note: same time!
+                '+2026-06-22T11:17:00+09:00',  // Note: same time!
                 '2026-06-22T11:17:00+01:00',  // (BST)
                 ['JST', false],
             ],
@@ -825,44 +863,7 @@ class DateTest extends TestCase
         $this->assertInstanceOf(Date::class, $something);
         $this->assertNotSame($date, $something);
 
-        $this->assertSame($expectedDateTimeStr, $something->format('c'));
-    }
-
-    public function testToisodatetimestring(): void
-    {
-        // We go around the houses here so it's clear we started with something different to the expected output
-        $input = new DateTimeImmutable('2026-06-22 20:15:37')
-            ->setTimezone(new DateTimeZone('JST'))
-        ;
-
-        $this->assertSame(
-            '2026-06-23T05:15:37+09:00',
-            new Date($input)->toIsoDateTimeString(),
-        );
-    }
-
-    public function testMagicTostringCallsToisodatetimestringOnly(): void
-    {
-        $expectedDateTimeStr = '2026-06-23T05:15:37+09:00';
-
-        $dateMock = $this
-            ->getMockBuilder(Date::class)
-            ->onlyMethods(['toIsoDateTimeString'])
-            ->disableOriginalConstructor()
-            ->getMock()
-        ;
-
-        $dateMock
-            ->expects($this->once())
-            ->method('toIsoDateTimeString')
-            ->with()
-            ->willReturn($expectedDateTimeStr)
-        ;
-
-        $this->assertSame(
-            $expectedDateTimeStr,
-            (string) $dateMock,
-        );
+        $this->assertSame($expectedDateTimeStr, $something->toIsoDateTimeString());
     }
 
     public function testYesterdayReturnsTheStartOfYesterday(): void
