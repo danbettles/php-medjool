@@ -880,4 +880,20 @@ class DateTest extends TestCase
             Date::tomorrow()->toImmutable(),
         );
     }
+
+    public function testNowReturnsThisInstant(): void
+    {
+        $this->assertDateTimeSimilar(
+            new DateTimeImmutable(),
+            Date::now()->toImmutable(),
+        );
+    }
+
+    public function testTodayReturnsTheStartOfToday(): void
+    {
+        $this->assertDateTimeSimilar(
+            new DateTimeImmutable()->setTime(0, 0),
+            Date::today()->toImmutable(),
+        );
+    }
 }

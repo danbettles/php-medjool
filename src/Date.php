@@ -132,6 +132,22 @@ readonly class Date
     private DateTimeImmutable $pit;
 
     /**
+     * Factory method, returns this instant
+     */
+    public static function now(): self
+    {
+        return new self();
+    }
+
+    /**
+     * Factory method, returns the start of today
+     */
+    public static function today(): self
+    {
+        return new self()->trunc();
+    }
+
+    /**
      * Factory method, returns the start of yesterday
      */
     public static function yesterday(): self
