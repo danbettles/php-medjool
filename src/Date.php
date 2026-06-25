@@ -301,6 +301,11 @@ readonly class Date
         return $this->toIsoDateTimeString();
     }
 
+    public function getTimestamp(): int
+    {
+        return $this->pit->getTimestamp();
+    }
+
     /**
      * Returns: all components in descending-size order; or only the named components in the specified order
      *

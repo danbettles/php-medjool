@@ -947,4 +947,12 @@ class DateTest extends TestCase
     {
         $this->assertNull(Date::tryFrom($invalidInput));
     }
+
+    public function testGettimestamp(): void
+    {
+        $this->assertSame(
+            1781654400,
+            new Date('2026-06-17')->getTimestamp(),
+        );
+    }
 }
