@@ -2,6 +2,7 @@
 
 namespace DanBettles\Medjool;
 
+use DateMalformedStringException;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
@@ -9,6 +10,7 @@ use DateTimeZone;
 use LogicException;
 use NoDiscard;
 use OutOfBoundsException;
+use TypeError;
 
 use function array_column;
 use function array_combine;
@@ -24,6 +26,7 @@ use function explode;
 use function implode;
 use function intval;
 use function is_int;
+use function str_contains;
 use function trim;
 
 use const false;
@@ -130,6 +133,28 @@ readonly class Date
      * N.B. Strictly immutable only!
      */
     private DateTimeImmutable $pit;
+
+    /**
+     * Factory method, returns an instance created from the input; returns `null` if the input couldn't be translated
+     *
+     * By design, exceptions will leak out if something goes *very* wrong
+     */
+    public static function tryFrom(mixed $something): self|null
+    {
+        try {
+            // @phpstan-ignore argument.type (Because I don't want to repeat the rule about accepted types)
+            return new self($something);
+        } catch (TypeError $ex) {
+            if (str_contains($ex->getMessage(), __CLASS__ . '::__construct(): Argument ')) {
+                // We'll allow a `TypeError` only at the point of entry
+                return null;
+            }
+
+            throw $ex;
+        } catch (DateMalformedStringException $ex) {
+            return null;
+        }
+    }
 
     /**
      * Factory method, returns this instant

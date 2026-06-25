@@ -16,6 +16,7 @@ use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
 use const false;
+use const null;
 use const true;
 
 /**
@@ -59,12 +60,19 @@ class DateTest extends TestCase
         string $expectedDateTimeStr,
         string|int $dateTimeLike,
     ): void {
-        $date = new Date($dateTimeLike);
         $immutable = new DateTimeImmutable($expectedDateTimeStr);
         $mutable = new DateTime($expectedDateTimeStr);
 
+        $date = new Date($dateTimeLike);
+
         $this->assertEquals($immutable, $date->toImmutable());
         $this->assertEquals($mutable, $date->toMutable());
+
+        $this->assertEquals(
+            $date,
+            Date::tryFrom($dateTimeLike),
+            'For valid values, the factory method must behave the same as the constructor',
+        );
     }
 
     public function testConstructorDoesNotWrapADatetimeinterfaceObject(): void
@@ -104,17 +112,24 @@ class DateTest extends TestCase
     public function testConstructorBehavesTheSameAsADatetimeinterfaceConstructorWhenPassedARelativeValue(
         string $relativeValue,
     ): void {
-        $date = new Date($relativeValue);
         $immutable = new DateTimeImmutable($relativeValue);
         $mutable = new DateTime($relativeValue);
 
+        $date = new Date($relativeValue);
+
+        /** @var Date */
+        $fromFactory = Date::tryFrom($relativeValue);
+
         $this->assertDateTimeSimilar($immutable, $date->toImmutable());
         $this->assertDateTimeSimilar($mutable, $date->toMutable());
+
+        $this->assertDateTimeSimilar($date->toImmutable(), $fromFactory->toImmutable());
     }
 
     public function testCanBeInstantiatedWithoutArguments(): void
     {
         $date = new Date();
+
         $immutable = new DateTimeImmutable();
         $mutable = new DateTime();
 
@@ -909,5 +924,27 @@ class DateTest extends TestCase
             new DateTimeImmutable()->setTime(0, 0),
             Date::today()->toImmutable(),
         );
+    }
+
+    /** @return array<mixed[]> */
+    public static function providesInvalidInputForTryfrom(): array
+    {
+        return [
+            'A string but not a date' => [
+                'foo',
+            ],
+            'Nothing' => [
+                null,
+            ],
+            'Ambiguous number' => [
+                3.14159,
+            ],
+        ];
+    }
+
+    #[DataProvider('providesInvalidInputForTryfrom')]
+    public function testTryfromReturnsNullIfTheInputIsInvalid(mixed $invalidInput): void
+    {
+        $this->assertNull(Date::tryFrom($invalidInput));
     }
 }
