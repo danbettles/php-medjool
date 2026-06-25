@@ -26,9 +26,6 @@ class DateTest extends TestCase
 {
     use TestCaseAssertionsTrait;
 
-    private const string FORMAT_DATE = 'Y-m-d';
-    private const string FORMAT_DATE_TIME = self::FORMAT_DATE . ' H:i:s.u';
-
     public function testIsReadonly(): void
     {
         $this->assertTrue(
@@ -378,7 +375,7 @@ class DateTest extends TestCase
     public function testFormatCallsTheProxyMethodOnly(): void
     {
         $expectedDateStr = '2026-06-19';
-        $format = self::FORMAT_DATE;
+        $format = 'Y-m-d';
 
         $dateMock = $this
             ->getMockBuilder(Date::class)
@@ -409,14 +406,19 @@ class DateTest extends TestCase
                 '2026-06-19 14:17:28.123456',
                 'j M',
             ],
-            [
+            'Tests are run in UTC' => [
                 '+2026-06-19T14:17:28+00:00',
                 '2026-06-19 14:17:28.123456',
                 DateTimeInterface::ISO8601_EXPANDED,
             ],
-            [
+            'Single-char full-date format' => [
                 'Fri, 19 Jun 2026 14:17:28 +0000',
                 '2026-06-19 14:17:28.123456',
+                'r',
+            ],
+            'Time zone is retained' => [
+                'Thu, 25 Jun 2026 17:30:07 +0900',
+                '+2026-06-25T17:30:07+09:00',
                 'r',
             ],
         ];
@@ -444,36 +446,36 @@ class DateTest extends TestCase
     {
         return [
             [
-                '2026-01-01 00:00:00.000000',
+                '+2026-01-01T00:00:00+00:00',
                 '2026-06-18 13:07:07.123456',
                 ['year'],
             ],
             [
-                '2026-06-01 00:00:00.000000',
+                '+2026-06-01T00:00:00+00:00',
                 '2026-06-18 13:07:07.123456',
                 ['month'],
             ],
             [
-                '2026-06-18 00:00:00.000000',
+                '+2026-06-18T00:00:00+00:00',
                 '2026-06-18 13:07:07.123456',
                 ['day'],
             ],
             [
-                '2026-06-18 00:00:00.000000',
+                '+2026-06-18T00:00:00+00:00',
                 '2026-06-18 13:07:07.123456',
             ],
             [
-                '2026-06-18 13:00:00.000000',
+                '+2026-06-18T13:00:00+00:00',
                 '2026-06-18 13:07:07.123456',
                 ['hour'],
             ],
             [
-                '2026-06-18 13:07:00.000000',
+                '+2026-06-18T13:07:00+00:00',
                 '2026-06-18 13:07:07.123456',
                 ['minute'],
             ],
             [
-                '2026-06-18 13:07:07.000000',
+                '+2026-06-18T13:07:07+00:00',
                 '2026-06-18 13:07:07.123456',
                 ['second'],
             ],
@@ -499,7 +501,7 @@ class DateTest extends TestCase
 
         $this->assertSame(
             $expectedDateTimeStr,
-            $startOfSomething->format(self::FORMAT_DATE_TIME),
+            $startOfSomething->format(DateTimeInterface::ISO8601_EXPANDED),
         );
     }
 
@@ -725,15 +727,20 @@ class DateTest extends TestCase
     public static function providesModifiedDatetimes(): array
     {
         return [
-            [
-                '2026-06-20 00:00:00.000000',
+            'Tests are run in UTC' => [
+                '+2026-06-20T00:00:00+00:00',
                 '2026-06-19 14:17:28.123456',
                 'next saturday',
             ],
             [
-                '2026-06-26 14:17:28.123456',
+                '+2026-06-26T14:17:28+00:00',
                 '2026-06-19 14:17:28.123456',
                 '+7 days',
+            ],
+            'Time zone is retained' => [
+                '+2026-03-30T13:00:00+01:00',
+                new DateTimeImmutable('+2026-03-29T12:00:00+00:00')->setTimezone(new DateTimeZone('Europe/London')),
+                '+24 hours',
             ],
         ];
     }
@@ -741,14 +748,14 @@ class DateTest extends TestCase
     #[DataProvider('providesModifiedDatetimes')]
     public function testModifyBehavesTheSameAsTheDatetimeinterfaceModifyMethod(
         string $expectedDateTimeStr,
-        string $inputDateTimeStr,
+        string|DateTimeImmutable $inputDateTimeValue,
         string $modifier,
     ): void {
-        $modified = new Date($inputDateTimeStr)->modify($modifier);
+        $modified = new Date($inputDateTimeValue)->modify($modifier);
 
         $this->assertSame(
             $expectedDateTimeStr,
-            $modified->format(self::FORMAT_DATE_TIME),
+            $modified->format(DateTimeInterface::ISO8601_EXPANDED),
         );
     }
 
@@ -901,7 +908,7 @@ class DateTest extends TestCase
         $this->assertInstanceOf(Date::class, $something);
         $this->assertNotSame($date, $something);
 
-        $this->assertSame($expectedDateTimeStr, $something->toIsoDateTimeString());
+        $this->assertSame($expectedDateTimeStr, $something->format(DateTimeInterface::ISO8601_EXPANDED));
     }
 
     public function testYesterdayReturnsTheStartOfYesterday(): void
