@@ -1,6 +1,8 @@
 # Medjool
 
-A simple extension of PHP's Date/Time module, to make working with dates and times a little smoother.  In general, I think Date/Time is actually pretty great.  In some cases, though, things can feel a little clunky, so that's why Medjool is "like PHP dates, only juicier".
+A simple extension of PHP's Date/Time module, to make working with dates and times a little smoother.
+
+In general, I think Date/Time is actually pretty great.  In some cases, though, things can feel a little clunky, so that's why Medjool is "like PHP dates, only juicier".
 
 ## Overview
 
