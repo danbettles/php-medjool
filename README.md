@@ -9,7 +9,7 @@ At Medjool's heart is the `Date` class, which is a Value Object&mdash;like `Date
 Of note:
 
 - The constructor accepts a date-time string, an integer timestamp, a `DateTimeImmutable`, or a `DateTime`, so there's no need to use different methods to create an instance.
-- Provides `toIsoDateTimeString()`, `toMysqlDateString()`, and `toMysqlDateTimeString()` to easily format the date.
+- Provides `toIsoDateString()`, `toIsoDateTimeString()`, `toMysqlDateString()`, and `toMysqlDateTimeString()` to easily format the date.
 - `getComponents()` returns all/selected date and time components in an associative array; `getComponent()` returns a single, specified date/time component.
 - `startOf()` and its alias, `trunc()`, resets the date to the specified date component.
 - `isInPast()` and `isInFuture()` simply read better.

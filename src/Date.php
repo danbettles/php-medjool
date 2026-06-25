@@ -252,7 +252,15 @@ readonly class Date
     }
 
     /**
-     * Returns the date in ISO-8601 Expanded format, which is supported by JavaScript's `Date` object -- see
+     * Returns the date in ISO-8601 (Expanded) format
+     */
+    public function toIsoDateString(): string
+    {
+        return explode('T', $this->toIsoDateTimeString())[0];
+    }
+
+    /**
+     * Returns the date and time in ISO-8601 Expanded format, which is supported by JavaScript's `Date` object -- see
      * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date#date_time_string_format
      */
     public function toIsoDateTimeString(): string

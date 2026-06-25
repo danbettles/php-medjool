@@ -772,6 +772,19 @@ class DateTest extends TestCase
         );
     }
 
+    public function testToisodatestring(): void
+    {
+        // We go around the houses here so it's clear we started with something different to the expected output
+        $input = new DateTimeImmutable('2026-06-22 20:15:37')
+            ->setTimezone(new DateTimeZone('JST'))
+        ;
+
+        $this->assertSame(
+            '+2026-06-23',
+            new Date($input)->toIsoDateString(),
+        );
+    }
+
     public function testToisodatetimestring(): void
     {
         // We go around the houses here so it's clear we started with something different to the expected output
