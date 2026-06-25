@@ -135,7 +135,7 @@ readonly class Date
     private DateTimeImmutable $pit;
 
     /**
-     * Factory method, returns an instance created from the input; returns `null` if the input couldn't be translated
+     * Factory method, tries to create an instance from the input; returns `null` if the input couldn't be translated
      *
      * By design, exceptions will leak out if something goes *very* wrong
      */
@@ -186,6 +186,18 @@ readonly class Date
     public static function tomorrow(): self
     {
         return new self('+1 day')->trunc();
+    }
+
+    /**
+     * For convenience, tries to (re)format the input; returns `null` if it couldn't be formatted
+     *
+     * By design, exceptions will leak out if something goes *very* wrong
+     */
+    public static function tryFormat(
+        mixed $something,
+        string $format,
+    ): string|null {
+        return self::tryFrom($something)?->format($format);
     }
 
     public function __construct(

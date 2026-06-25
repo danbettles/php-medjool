@@ -16,3 +16,4 @@ Of note:
 - `startOf()` and its alias, `trunc()`, resets the date to the specified date component.
 - `isInPast()` and `isInFuture()` simply read better.
 - `setTimezone()` gives you the option to preserve the time.
+- For convenience: `::tryFrom()` creates an instance or returns `null`; `::tryFormat()` (re)formats a date-ish or returns `null`.

@@ -158,7 +158,7 @@ class DateTest extends TestCase
     }
 
     /** @return array<mixed[]> */
-    public static function providesComponents(): array
+    public static function providesComponentArrays(): array
     {
         return [
             'Return all values by default' => [
@@ -206,7 +206,7 @@ class DateTest extends TestCase
      * @param array<string,int> $expectedComponents
      * @param array{string} $methodArgs
      */
-    #[DataProvider('providesComponents')]
+    #[DataProvider('providesComponentArrays')]
     public function testGetcomponents(
         array $expectedComponents,
         string $inputDateTimeStr,
@@ -414,6 +414,11 @@ class DateTest extends TestCase
                 '2026-06-19 14:17:28.123456',
                 DateTimeInterface::ISO8601_EXPANDED,
             ],
+            [
+                'Fri, 19 Jun 2026 14:17:28 +0000',
+                '2026-06-19 14:17:28.123456',
+                'r',
+            ],
         ];
     }
 
@@ -426,6 +431,11 @@ class DateTest extends TestCase
         $this->assertSame(
             $expectedDateTimeStr,
             new Date($inputDateTimeStr)->format($format),
+        );
+
+        $this->assertSame(
+            $expectedDateTimeStr,
+            Date::tryFormat($inputDateTimeStr, $format),
         );
     }
 
@@ -927,7 +937,7 @@ class DateTest extends TestCase
     }
 
     /** @return array<mixed[]> */
-    public static function providesInvalidInputForTryfrom(): array
+    public static function providesInvalidDatetimes(): array
     {
         return [
             'A string but not a date' => [
@@ -942,10 +952,10 @@ class DateTest extends TestCase
         ];
     }
 
-    #[DataProvider('providesInvalidInputForTryfrom')]
-    public function testTryfromReturnsNullIfTheInputIsInvalid(mixed $invalidInput): void
+    #[DataProvider('providesInvalidDatetimes')]
+    public function testTryfromReturnsNullIfTheDatetimeIsInvalid(mixed $invalidDatetime): void
     {
-        $this->assertNull(Date::tryFrom($invalidInput));
+        $this->assertNull(Date::tryFrom($invalidDatetime));
     }
 
     public function testGettimestamp(): void
@@ -954,5 +964,11 @@ class DateTest extends TestCase
             1781654400,
             new Date('2026-06-17')->getTimestamp(),
         );
+    }
+
+    #[DataProvider('providesInvalidDatetimes')]
+    public function testTryformatReturnsNullIfTheDatetimeIsInvalid(mixed $invalidDatetime): void
+    {
+        $this->assertNull(Date::tryFormat($invalidDatetime, 'r'));
     }
 }
